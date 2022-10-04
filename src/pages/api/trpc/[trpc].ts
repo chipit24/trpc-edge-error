@@ -3,8 +3,9 @@
  * On a bigger app, you will probably want to split this file up into multiple files.
  */
 import { initTRPC } from '@trpc/server';
-import * as trpcNext from '@trpc/server/adapters/next';
+import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
 import { z } from 'zod';
+import type { NextRequest } from 'next/server';
 
 const t = initTRPC.create();
 
@@ -37,7 +38,11 @@ const appRouter = t.router({
 export type AppRouter = typeof appRouter;
 
 // export API handler
-export default trpcNext.createNextApiHandler({
-  router: appRouter,
-  createContext: () => ({}),
-});
+export default (req: NextRequest) => {
+  return fetchRequestHandler({
+    router: appRouter,
+    req,
+    endpoint: '/api/trpc',
+    createContext: () => ({}),
+  });
+};
